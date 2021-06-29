@@ -3,6 +3,15 @@ import requests
 import json
 import logging
 import random
+import text2emotion as te
+
+emotion_conversion = {
+    "Happy": "Positive",
+    "Fear": "Negative",
+    "Angry": "Negative",
+    "Surprise": "Mutual",
+    "Sad": "Negative"
+}
 
 
 def get_proxies():
@@ -13,14 +22,15 @@ def get_proxies():
             proxies.append(tmp)
     return proxies
 
+
 def get_tweets(query, count, proxy=None):
     # Uncomment out if you want to know that you aren't using a proxy -- gets a bit spammy
     # if proxy is None:
     #     logging.basicConfig(format='%(asctime)s -> %(message)s', datefmt='%d-%b-%y %H:%M:%S')
     #     logging.warning('No proxy given, local network will be used -- be careful of getting banned.')
-    if proxy is None:
-        rand_proxy = random.choice(get_proxies())
-        proxy = { 'https' : f'https://{rand_proxy[2]}:{rand_proxy[3]}@{rand_proxy[0]}:{rand_proxy[1]}' }
+    # if proxy is None:
+    #     rand_proxy = random.choice(get_proxies())
+    #     proxy = {'https': f'https://{rand_proxy[2]}:{rand_proxy[3]}@{rand_proxy[0]}:{rand_proxy[1]}'}
     # List of tweets
     tweets = []
     # Default headers
@@ -38,14 +48,16 @@ def get_tweets(query, count, proxy=None):
         # Guest token is REQUIRED to retrieve a response
         try:
             if proxy is not None:
-                req = s.post(proxies=proxy, headers=headers, url='https://api.twitter.com/1.1/guest/activate.json').content
+                req = s.post(proxies=proxy, headers=headers,
+                             url='https://api.twitter.com/1.1/guest/activate.json').content
                 headers['x-guest-token'] = json.loads(req)['guest_token']
             else:
                 req = s.post(headers=headers,
                              url='https://api.twitter.com/1.1/guest/activate.json').content
                 headers['x-guest-token'] = json.loads(req)['guest_token']
         except Exception as e:
-            raise Exception(f'Request error trying to retrieve a guest token.\nTraceback: {e}\nRequest Status Code: {req}')
+            raise Exception(
+                f'Request error trying to retrieve a guest token.\nTraceback: {e}\nRequest Status Code: {req}')
 
         # Retrieve the last 20 tweets from the given query
         try:
@@ -76,7 +88,7 @@ def get_tweets(query, count, proxy=None):
                 replies=value['reply_count'],
                 retweets=value['retweet_count'],
                 likes=value['favorite_count'],
-                hashtags=[f"#{hashtag['text']}" for hashtag in value['entities']['hashtags']]
-            )
+                hashtags=[f"#{hashtag['text']}" for hashtag in value['entities']['hashtags']],
+                emotion=emotion_conversion[sorted(te.get_emotion(value['full_text']).items(), key=lambda k: k[1], reverse=True)[0][0]])
             tweets.append(t)
     return tweets

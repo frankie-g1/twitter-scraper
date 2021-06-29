@@ -1,6 +1,6 @@
 class Tweet:
 
-    def __init__(self, timestamp, tweet_id, tweet_url, username, content, user_id, replies, retweets, likes, hashtags):
+    def __init__(self, timestamp, tweet_id, tweet_url, username, content, user_id, replies, retweets, likes, hashtags, emotion):
         self.timestamp = timestamp
         self.tweet_id = tweet_id
         self.tweet_url = tweet_url
@@ -11,6 +11,7 @@ class Tweet:
         self.retweets = retweets
         self.likes = likes
         self.hashtags = hashtags
+        self.emotion = emotion
 
     def __str__(self):
         return f'Timestamp:\n\t{self.timestamp}\n\t' \
@@ -21,7 +22,8 @@ class Tweet:
                f'User ID:\n\t\t{self.user_id}\n\t' \
                f'Reply Count:\n\t\t{self.replies}\n\t' \
                f'Like Count:\n\t\t{self.likes}\n\t' \
-               f'Hashtags:\n\t\t{self.hashtags}'
+               f'Hashtags:\n\t\t{self.hashtags}' \
+               f'Emotion:\n\t\t{self.emotion}'
 
     def to_json(self):
         return {
@@ -33,5 +35,6 @@ class Tweet:
             'user_id': {self.user_id},
             'reply_count': {self.replies},
             'like_count': {self.likes},
-            'hashtags': [h for h in self.hashtags]
+            'hashtags': [h for h in self.hashtags],
+            'emotion': {self.emotin}
         }
