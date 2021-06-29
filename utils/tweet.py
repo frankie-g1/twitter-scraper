@@ -25,16 +25,19 @@ class Tweet:
                f'Hashtags:\n\t\t{self.hashtags}' \
                f'Emotion:\n\t\t{self.emotion}'
 
+    def one_line(self):
+        return ""
+
     def to_json(self):
         return {
-            'timestamp': {self.timestamp},
-            'tweet_id': {self.tweet_id},
-            'tweet_url': {self.tweet_url},
-            'username': {self.username},
-            'content': {self.content},
-            'user_id': {self.user_id},
-            'reply_count': {self.replies},
-            'like_count': {self.likes},
+            'timestamp': self.timestamp,
+            'tweet_id': self.tweet_id,
+            'tweet_url': self.tweet_url,
+            'username': self.username,
+            'content': self.content,
+            'user_id': self.user_id,
+            'reply_count': self.replies,
+            'like_count': self.likes,
             'hashtags': [h for h in self.hashtags],
-            'emotion': {self.emotin}
+            'emotion': self.emotion
         }

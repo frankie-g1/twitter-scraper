@@ -2,6 +2,7 @@ from utils.scraper import get_tweets
 from firebase import firebase
 import threading
 import time
+import json
 
 queue = []
 
@@ -20,6 +21,10 @@ def post_to_database(query, t):
     db.put(f'/twitter/queries/{query}/{t.timestamp}', name="hashtags", data=t.hashtags)
     db.put(f'/twitter/queries/{query}/{t.timestamp}', name="emotion", data=t.emotion)
 
+def write_to_file(query, t):
+    with open('A:\\Big Data\\tweets.json', 'a') as f:
+        json.dump(t.to_json(), f)
+        f.write('\n')
 
 def post_queue():
     start_time = time.time()
@@ -31,12 +36,12 @@ def post_queue():
         threads = []
         if len(queue) < 5:
             for i in range(len(queue)):
-                x = threading.Thread(target=post_to_database, args=queue.pop(0))
+                x = threading.Thread(target=write_to_file, args=queue.pop(0))
                 threads.append(x)
                 x.start()
         else:
             for i in range(5):
-                x = threading.Thread(target=post_to_database, args=queue.pop(0))
+                x = threading.Thread(target=write_to_file, args=queue.pop(0))
                 threads.append(x)
                 x.start()
         for t in threads:
@@ -54,9 +59,10 @@ if __name__ == "__main__":
             if t.tweet_id not in tweets:
                 tweets.append(t.tweet_id)
                 # Add to queue
-                queue.append([query, t])
+                write_to_file(query, t)
+                # queue.append([query, t])
         # Start queue processing
-        threading.Thread(target=post_queue).start()
+        # threading.Thread(target=post_queue).start()
 
         print("Checking tweets took --- %s seconds ---" % (time.time() - start_time))
 
