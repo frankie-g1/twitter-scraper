@@ -1,5 +1,4 @@
 from utils.scraper import get_tweets
-from firebase import firebase
 import threading
 import time
 import json
@@ -21,10 +20,12 @@ def post_to_database(query, t):
     db.put(f'/twitter/queries/{query}/{t.timestamp}', name="hashtags", data=t.hashtags)
     db.put(f'/twitter/queries/{query}/{t.timestamp}', name="emotion", data=t.emotion)
 
+
 def write_to_file(query, t):
-    with open('A:\\Big Data\\tweets.json', 'a') as f:
+    with open(r'C:\Users\guarinof\PycharmProjects\twitter-scraper\tweets.json', 'a') as f:
         json.dump(t.to_json(), f)
         f.write('\n')
+
 
 def post_queue():
     start_time = time.time()
